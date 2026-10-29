@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>باغ درون من</title>
+<meta name="description" content="رشد آرام، قدم‌های کوچک">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f0e2;--card:#fffaf0;--ink:#3a3a2a;--mut:#7a7560;--olive:#5f6f33;--sage:#a9b898;--brown:#b08a5b;--orange:#e8a15e;--line:#e4dac3;--g:#8aa36b;--y:#e6c76a;--b:#7f9bb5;--on:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root{--bg:#1d2017;--card:#292d20;--ink:#ece6d2;--mut:#aaa58d;--olive:#a9bf6a;--line:#3d4230;--sage:#6f7f5e;--on:#1d2017;color-scheme:dark}}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.8 Vazirmatn,Tahoma,sans-serif}
+h1,h2,h3{font-weight:800;margin:0 0 .4rem;line-height:1.4}h2{font-size:1.15rem}h3{font-size:1rem}
+.wrap{max-width:900px;margin:0 auto;padding:0 14px 96px}
+nav{position:fixed;bottom:0;inset-inline:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+nav button{background:none;border:0;color:var(--mut);font:inherit;font-size:.68rem;padding:4px 2px;flex:1;white-space:nowrap;border-radius:10px;cursor:pointer}
+nav button.on{color:var(--on);background:var(--olive)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px}
+.hero{border-radius:0 0 28px 28px;overflow:hidden;margin:0 -14px 14px;position:relative}
+.hero svg{display:block;width:100%;height:auto}
+.hero .tx{position:absolute;inset:auto 18px 14px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.35)}
+.hero b{font-size:1.3rem;display:block}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+input,select,textarea,button{font:inherit;color:var(--ink)}
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;width:100%}
+textarea{min-height:70px;resize:vertical}
+label{display:block;font-size:.88rem;color:var(--mut);margin:8px 0 2px}
+.btn{background:var(--olive);color:var(--on);border:0;border-radius:12px;padding:7px 14px;cursor:pointer}
+.btn.q{background:none;color:var(--olive);border:1px solid var(--sage)}
+.ic{background:none;border:0;cursor:pointer;color:var(--mut);padding:2px 6px;border-radius:8px}
+.ic:hover,.ic.on{color:var(--orange)}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.seg button{flex:1;min-width:90px;border:2px solid transparent;border-radius:14px;padding:8px;cursor:pointer;color:#2c2c20}
+.seg button.on{border-color:var(--ink)}
+ul{list-style:none;margin:0;padding:0}
+.tk{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.tk .tx{flex:1;border-color:transparent;background:none;min-width:0}
+.tk.dn .tx{text-decoration:line-through;color:var(--mut)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.mut{color:var(--mut);font-size:.88rem}
+.note{background:color-mix(in srgb,var(--sage) 25%,var(--card));border-radius:12px;padding:8px 12px;font-size:.9rem}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:20px;padding:4px 12px;cursor:pointer}
+.chip.on{background:var(--olive);color:var(--on)}
+.tag{display:inline-block;font-size:.78rem;border-radius:8px;padding:0 8px;background:var(--sage);color:#26301a}
+details{border-top:1px solid var(--line);padding:8px 0}summary{cursor:pointer;font-weight:600}
+@media(prefers-reduced-motion:no-preference){.hero svg circle{transition:cy .6s ease}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav id="nav"></nav>
+<script>
+const $=s=>document.querySelector(s),fa=n=>Number(n).toLocaleString('fa-IR');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const fmt=(d,o)=>new Intl.DateTimeFormat('fa-IR-u-ca-persian',o).format(d);
+const pd=k=>{const[a,b,c]=k.split('-');return new Date(+a,+b-1,+c)};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const CATS={job:['شغل','#b08a5b'],learn:['یادگیری','#6b7a3a'],content:['تولید محتوا','#e8a15e'],health:['سلامت','#8aa36b'],spirit:['معنویت','#7f9bb5'],personal:['امور شخصی','#a9b898']};
+const FEEL=[['آرام','#a9c3a0'],['امیدوار','#e6c76a'],['سپاسگزار','#e8a15e'],['پرانرژی','#8aa36b'],['خسته','#b9ad94'],['مضطرب','#c9b79c'],['غمگین','#8fa5b8'],['گیج','#b0a7c0']];
+const STEPS=[
+['مرور Python','روان‌شدن در نوشتن کدهای کوچک','متغیر، شرط، حلقه، تابع، فایل','حل یک تمرین کوچک (مثلاً ماشین‌حساب یا لیست کارها)','اسکریپت مدیریت فایل‌ها'],
+['Git و GitHub','ذخیره و اشتراک‌گذاری کد با تاریخچه','commit، branch، push، pull request','ساخت یک مخزن و چند commit','مخزن پورتفولیوی اولیه با README'],
+['JSON و API','خواندن داده از سرویس‌های آنلاین','ساختار JSON، HTTP، requests، کلید API','فراخوانی یک API عمومی و نمایش نتیجه','اسکریپت دریافت آب‌وهوا یا قیمت'],
+['SQL و پایگاه داده','ذخیره و پرس‌وجوی داده','SELECT، JOIN، INSERT، SQLite','ساخت جدول و چند پرس‌وجو','ردیاب ساده با SQLite'],
+['n8n و Workflow','ساخت اتوماسیون بصری','trigger، node، webhook، شرط','ساخت یک workflow دو مرحله‌ای','اتوماسیون ارسال خلاصه روزانه'],
+['FastAPI','ساخت API خودم','route، مدل داده، اعتبارسنجی، مستندات خودکار','ساخت یک endpoint ساده','سرویس کوچک برای یکی از workflowها'],
+['ابزارهای AI و LLM API','استفاده از مدل‌های زبانی در پروژه','prompt، پارامترها، خروجی ساختاریافته','ارسال یک prompt از کد و پردازش پاسخ','ابزار خلاصه‌ساز متن'],
+['RAG و AI Agents','پاسخ‌گویی بر پایه اسناد و استفاده از ابزارها','embedding، جستجوی برداری، chunking، tool calling','ساخت RAG روی چند سند','پرسش‌وپاسخ روی یادداشت‌های خودم'],
+['خطا، امنیت، استقرار','قابل‌اعتماد کردن پروژه‌ها','try/except، متغیر محیطی، Docker، لاگ، مستندسازی','استقرار یک سرویس کوچک','انتشار یک پروژه با مستندات'],
+['پورتفولیو و بازار کار','نمایش مهارت‌ها','انتخاب ۳ پروژه، رزومه، لینکدین، روایت پروژه','نوشتن توضیح یک پروژه برای دیگران','سایت یا صفحه پورتفولیو']
+];
+const KEY='bagh-daroon-v1';
+let warn='';
+function init(){return{set:{kinds:[1,1,1,1,1,2,0].map((v,i)=>[1,1,1,1,2,0,1][i]===undefined?v:[1,1,1,1,2,0,1][i]),wake:'06:30',ws:'08:00',we:'17:00',learn:40,content:30},days:{},rm:STEPS.map((_,i)=>({st:i?'todo':'doing',note:''})),cont:[],jr:[],rev:{}}}
+// kinds by JS getDay(): 0 Sun .. 6 Sat ; 0 work,1 ... see KINDS below
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&r.set)return r}catch(e){warn='خواندن داده‌های ذخیره‌شده ممکن نشد؛ با داده خالی شروع شد.'}return init()}
+function save(){S.ts=Date.now();delete S.fresh;syncSoon();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){warn='ذخیره در مرورگر ممکن نیست؛ تغییرات فقط تا بستن صفحه می‌مانند.';render()}}
+let S=load();
+// kinds: 0=کاری 1=سبک 2=استراحت ; default Sat–Wed work, Thu light, Fri rest
+if(!localStorage.getItem(KEY)){S.set.kinds=[0,0,0,0,1,2,0];S.fresh=true;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const KINDS=['روز کاری','روز سبک','روز استراحت'];
+const D=k=>S.days[k]||(S.days[k]={type:'',energy:null,feel:'',prios:['','',''],tasks:[],win:'',gr:''});
+const uid=()=>Math.random().toString(36).slice(2,9);
+let view='today',showAll=false,msg='',tm={left:25*60,run:false,iv:null},chartN=7,cf={},resetAsk=false,expText='';
+const today=()=>iso(new Date());
+const VIEWS=[['today','امروز'],['week','هفته'],['road','مسیر'],['content','محتوا'],['mood','احساس'],['calm','روتین‌ها'],['ther','تمرین‌ها'],['set','تنظیمات']];
+
+function hero(t,d){
+ const sky={g:['#cfe3b8','#f6e7c1'],y:['#f1dfb0','#f4cf9c'],b:['#a9bccd','#cdd6df'],'':['#dfe8cf','#f6ecd0']}[t||''];
+ const night=t==='b',sy=night?34:t==='y'?60:40;
+ const h=new Date().getHours();const gr=h<5?'شب آرام':h<12?'صبح بخیر':h<17?'ظهر بخیر':h<21?'عصر بخیر':'شب آرام';
+ return `<div class="hero"><svg viewBox="0 0 600 220" role="img" aria-label="منظره باغ"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="600" height="220" fill="url(#sk)"/>
+ <circle cx="${night?470:130}" cy="${sy}" r="${night?20:28}" fill="${night?'#f3efe0':'#e8a15e'}"/>${night?'<circle cx="480" cy="30" r="17" fill="#a9bccd"/>':''}
+ <path d="M0 170 Q120 90 230 150 T430 130 T600 150 V220 H0Z" fill="#a9b898"/><path d="M0 195 Q150 140 300 185 T600 170 V220 H0Z" fill="#6b7a3a"/>
+ <path d="M300 190 q0-26 -2-40 M298 158 q-22-4 -26 -20 q22 0 26 20 M298 152 q20-6 24-22 q-22 2 -24 22" stroke="#e9f0d6" stroke-width="3" fill="#e9f0d6" stroke-linecap="round"/></svg>
+ <div class="tx"><b>${gr}</b>${fmt(pd(d),{weekday:'long',day:'numeric',month:'long',year:'numeric'})}<br><small>رشد آرام، قدم‌های کوچک</small></div></div>`}
+
+function taskRow(k,t,i,isToday){return `<li class="tk${t.done?' dn':''}"><input type="checkbox" data-p="days.${k}.tasks.${i}.done" data-r="1" ${t.done?'checked':''} aria-label="انجام شد"><i class="dot" style="background:${CATS[t.cat][1]}" title="${CATS[t.cat][0]}"></i><input type="text" class="tx" data-p="days.${k}.tasks.${i}.t" value="${esc(t.t)}" aria-label="عنوان کار">`+
+ (isToday?`<button class="ic${t.p?' on':''}" data-a="pri" data-k="${k}" data-i="${i}" title="اولویت مهم" aria-label="اولویت">★</button><button class="ic" data-a="tmr" data-k="${k}" data-i="${i}" title="ببر به فردا">فردا</button>`:
+ `<select data-mv="${k}|${i}" style="width:auto" aria-label="انتقال"><option value="">انتقال…</option>${weekKeys().filter(x=>x!==k).map(x=>`<option value="${x}">${fmt(pd(x),{weekday:'short'})}</option>`).join('')}</select>`)+
+ `<button class="ic" data-a="del" data-k="${k}" data-i="${i}" aria-label="حذف">✕</button></li>`}
+function weekKeys(){const n=new Date(),s=addD(n,-((n.getDay()+1)%7));return[...Array(7)].map((_,i)=>iso(addD(s,i)))}
+function curStep(){const i=S.rm.findIndex(r=>r.st==='doing');return i<0?S.rm.findIndex(r=>r.st==='todo'):i}
+
+function vToday(){const k=today(),d=D(k),hard=d.type==='b';
+ let list=d.tasks.map((t,i)=>[t,i]);
+ if(hard&&!showAll){let m=list.filter(([t])=>t.p);if(!m.length)m=list.filter(([t])=>!t.done).slice(0,3);list=m}
+ const cs=curStep(),hasLearn=d.tasks.some(t=>t.cat==='learn'||t.cat==='content');
+ const sug=cs>=0&&!hard&&!hasLearn&&S.set.kinds[new Date().getDay()]!==2;
+ const tp=[...Array(3)].map((_,i)=>`<input type="text" data-p="days.${k}.prios.${i}" value="${esc(d.prios[i])}" placeholder="اولویت ${fa(i+1)}" aria-label="اولویت ${fa(i+1)}">`).join('');
+ return hero(d.type,k)+`
+ <div class="card" style="border-color:var(--olive);text-align:center"><h3 class="mut" style="font-weight:600">نیت من</h3><textarea data-p="set.intent" aria-label="نیت من" style="border-color:transparent;background:none;text-align:center;font-size:1.15rem;font-weight:600;line-height:1.9;min-height:84px;resize:none">${esc(S.set.intent??'درد یا لذت کاری که انجام دادی نمی مونه اما افتخار یا شرمندگیش چرا')}</textarea>${((S.log&&S.log.int)||[]).filter(e=>e.d===k).slice(-1).map(e=>`<p class="mut" style="margin:0">نیت امروز: ${esc(e.t||e.n)}</p>`).join('')}</div>
+ <div class="card"><h2>امروز چه‌طور است؟</h2><div class="row seg" role="group" aria-label="نوع روز">
+ ${[['g','سبز: انرژی خوب','var(--g)'],['y','زرد: انرژی متوسط','var(--y)'],['b','آبی: روز سخت','var(--b)']].map(([v,l,c])=>`<button style="background:${c}" class="${d.type===v?'on':''}" data-a="type" data-v="${v}">${l}</button>`).join('')}</div>
+ ${hard?'<p class="note">امروز روز سخت است و همین کافی است. فقط کارهای ضروری پیدا هستند؛ بقیه جایی نمی‌روند و کسی از تو حساب نمی‌خواهد.</p>':''}
+ <label for="en">انرژی: <b>${d.energy==null?'ثبت نشده':fa(d.energy)}</b></label><input id="en" type="range" min="1" max="10" value="${d.energy??5}" data-p="days.${k}.energy" data-r="1" style="width:100%">
+ <div class="row" style="margin-top:6px">${FEEL.map(([f])=>`<button class="chip${d.feel===f?' on':''}" data-a="feel" data-v="${f}">${f}</button>`).join('')}</div></div>
+ <div class="card"><h2>سه چیزِ مهمِ امروز</h2><div class="grid">${tp}</div></div>
+ <div class="card"><h2>برنامه امروز</h2>
+ ${sug?`<p class="note">پیشنهاد (فقط اگر دوست داشتی): «${esc(STEPS[cs][3])}»، حدود ${fa(S.set.learn)} دقیقه. <button class="btn q" data-a="sug">افزودن به امروز</button></p>`:''}
+ <ul>${list.map(([t,i])=>taskRow(k,t,i,true)).join('')||'<li class="mut">هنوز کاری نیست. یک قدم کوچک اضافه کن.</li>'}</ul>
+ ${hard&&d.tasks.length>list.length?`<button class="btn q" data-a="showall">${showAll?'فقط ضروری‌ها':'نمایش بقیه'}</button>`:''}
+ <div class="row" style="margin-top:10px"><input type="text" id="nt" placeholder="کار تازه…" style="flex:2;min-width:140px" aria-label="کار تازه"><select id="nc" style="flex:1;min-width:110px" aria-label="دسته">${Object.entries(CATS).map(([c,v])=>`<option value="${c}">${v[0]}</option>`).join('')}</select><button class="btn" data-a="add" data-k="${k}">افزودن</button></div>
+ ${msg?`<div class="mut" role="alert">${msg}</div>`:''}</div>
+ <div class="card"><h2>تمرکز اختیاری</h2><div class="row"><b id="tm" style="font-size:1.6rem">${tmTxt()}</b>
+ <select id="tmsel" style="width:auto" ${tm.run?'disabled':''}>${[15,25,45].map(m=>`<option value="${m}"${tm.left===m*60||(!tm.run&&tm.left===m*60)?' selected':''}>${fa(m)} دقیقه</option>`).join('')}</select>
+ <button class="btn" data-a="tm">${tm.run?'توقف':'شروع'}</button></div></div>
+ <div class="card"><h2>پایان روز (هر وقت خواستی)</h2>
+ <label>یک موفقیت کوچک</label><input type="text" data-p="days.${k}.win" value="${esc(d.win)}">
+ <label>یک مورد شکرگزاری</label><input type="text" data-p="days.${k}.gr" value="${esc(d.gr)}"></div>`}
+function tmTxt(){const m=Math.floor(tm.left/60),s=tm.left%60;return fa(m)+':'+(s<10?'۰':'')+fa(s)}
+
+function vWeek(){const ks=weekKeys(),ws=ks[0],r=S.rev[ws]||(S.rev[ws]={});
+ return `<h1 style="margin-top:18px">برنامه هفته</h1><p class="mut">هیچ کاری خودکار جابه‌جا نمی‌شود؛ هر انتقال با انتخاب خودت است. حداکثر سه اولویت برای هر روز.</p><div class="grid">`+
+ ks.map(k=>{const d=D(k),dt=pd(k),kind=S.set.kinds[dt.getDay()];
+ return `<div class="card" style="${k===today()?'border-color:var(--olive)':''}"><h3>${fmt(dt,{weekday:'long',day:'numeric',month:'long'})}</h3><span class="tag">${KINDS[kind]}</span>
+ <ul>${d.tasks.map((t,i)=>taskRow(k,t,i,false)).join('')}</ul>
+ <div class="row" style="margin-top:6px"><input type="text" data-wk="${k}" placeholder="کار تازه…" style="flex:1" aria-label="کار تازه"><button class="btn q" data-a="wadd" data-k="${k}">+</button></div></div>`}).join('')+`</div>
+ <div class="card"><h2>مرور هفتگی</h2>
+ ${[['prog','چه پیشرفت‌هایی داشتم؟'],['obs','چه چیزی سد راهم بود؟'],['en','انرژی‌ام این هفته چه‌طور بود؟'],['good','چه لحظه‌های خوبی داشتم؟'],['next','هفته بعد چه چیزی را ساده‌تر کنم؟']].map(([f,l])=>`<label>${l}</label><textarea data-p="rev.${ws}.${f}">${esc(r[f])}</textarea>`).join('')}</div>`}
+
+function vRoad(){const cs=curStep();
+ return `<h1 style="margin-top:18px">مسیر یادگیری AI Automation</h1><p class="mut">مرحله فعلی: ${cs>=0?esc(STEPS[cs][0]):'همه مرحله‌ها کامل شده‌اند'}. فقط مرحله فعلی در پیشنهاد روزانه می‌آید. می‌توانی وضعیت و یادداشت هر مرحله را عوض کنی.</p>`+
+ STEPS.map((s,i)=>{const r=S.rm[i];return `<div class="card"><details ${i===cs?'open':''}><summary>${fa(i+1)}. ${s[0]} <span class="tag">${{todo:'شروع نشده',doing:'در حال انجام',done:'انجام شد'}[r.st]}</span></summary>
+ <p><b>هدف:</b> ${s[1]}</p><p><b>موضوعات:</b> ${s[2]}</p><p><b>تمرین عملی:</b> ${s[3]}</p><p><b>پروژه کوچک:</b> ${s[4]}</p>
+ <label>وضعیت</label><select data-p="rm.${i}.st" data-r="1"><option value="todo"${r.st==='todo'?' selected':''}>شروع نشده</option><option value="doing"${r.st==='doing'?' selected':''}>در حال انجام</option><option value="done"${r.st==='done'?' selected':''}>انجام شد</option></select>
+ <label>یادداشت</label><textarea data-p="rm.${i}.note">${esc(r.note)}</textarea>
+ <button class="btn q" style="margin-top:8px" data-a="idea" data-i="${i}">تبدیل به ایده محتوا</button></details></div>`}).join('')}
+
+const ST=[['idea','ایده'],['prep','در حال آماده‌سازی'],['ready','آماده انتشار'],['pub','منتشرشده']];
+function vContent(){
+ return `<h1 style="margin-top:18px">تولید محتوا</h1><p class="note">هفته سبک پیشنهادی: یک روز ایده‌پردازی، یک روز تولید، یک روز انتشار. وضعیت «منتشرشده» را فقط خودت ثبت می‌کنی؛ جایی خودکار منتشر نمی‌شود.</p>
+ <div class="card"><h2>ایده یا محتوای تازه</h2><div class="grid">
+ <div><label>موضوع</label><input type="text" id="c1"></div><div><label>پلتفرم</label><input type="text" id="c2" placeholder="مثلاً اینستاگرام"></div>
+ <div><label>قالب</label><select id="c3"><option>ریلز</option><option>پست</option><option>مقاله</option><option>ویدیو</option><option>توییت</option></select></div>
+ <div><label>تاریخ انتشار</label><input type="date" id="c4"></div><div><label>لینک</label><input type="text" id="c5" dir="ltr"></div></div>
+ <label>سناریو</label><textarea id="c6"></textarea>${msg?`<div class="mut" role="alert">${msg}</div>`:''}<button class="btn" style="margin-top:8px" data-a="cadd">افزودن</button></div>`+
+ ST.map(([s,l])=>{const it=S.cont.filter(c=>c.st===s);return `<div class="card"><h3>${l} (${fa(it.length)})</h3>${it.map(c=>`<details><summary>${esc(c.topic)} <span class="mut">${esc(c.plat)} · ${esc(c.fmt)}${c.date?' · '+fmt(pd(c.date),{day:'numeric',month:'long'}):''}</span></summary>
+ ${c.link?`<p dir="ltr" class="mut">${esc(c.link)}</p>`:''}<p>${esc(c.script)}</p><div class="row"><select data-ci="${c.id}" style="width:auto">${ST.map(([v,n])=>`<option value="${v}"${v===c.st?' selected':''}>${n}</option>`).join('')}</select><button class="ic" data-a="cdel" data-id="${c.id}">حذف</button></div></details>`).join('')||'<span class="mut">خالی</span>'}</div>`}).join('')}
+
+function vMood(){const k=today(),pts=[...Array(chartN)].map((_,i)=>{const kk=iso(addD(new Date(),i-chartN+1)),e=(S.days[kk]||{}).energy;return e==null?null:e});
+ const X=i=>10+i/(chartN-1)*280,Y=e=>80-(e-1)/9*70;let path='',dots='',pen=false;
+ pts.forEach((e,i)=>{if(e==null){pen=false;return}path+=(pen?'L':'M')+X(i)+' '+Y(e);pen=true;dots+=`<circle cx="${X(i)}" cy="${Y(e)}" r="3.5" fill="var(--orange)"/>`});
+ const last=S.jr.slice(-5).reverse();
+ return `<h1 style="margin-top:18px">دفتر احساسات و انرژی</h1><p class="mut">اینجا قضاوتی نیست؛ فقط دیدنِ خودت.</p>
+ <div class="card"><h2>روند انرژی</h2><div class="row"><button class="chip${chartN===7?' on':''}" data-a="cn" data-v="7">هفته</button><button class="chip${chartN===30?' on':''}" data-a="cn" data-v="30">ماه</button></div>
+ <svg viewBox="0 0 300 90" style="width:100%" role="img" aria-label="نمودار انرژی"><path d="M10 80H290M10 45H290M10 10H290" stroke="var(--line)"/><path d="${path}" fill="none" stroke="var(--olive)" stroke-width="2"/>${dots}</svg>
+ <p class="mut">${pts.some(e=>e!=null)?'فقط روزهایی که انرژی ثبت شده نشان داده می‌شوند.':'هنوز انرژی‌ای ثبت نکرده‌ای؛ از صفحه «امروز» می‌شود.'}</p></div>
+ <div class="card"><h2>ثبت امروز</h2><div class="row">${FEEL.map(([f,c])=>`<button class="chip${cf.ch===f?' on':''}" style="${cf.ch===f?'':`border-color:${c}`}" data-a="cfeel" data-v="${f}">${f}</button>`).join('')}</div>
+ ${[['h','چه اتفاقی افتاد؟'],['f','چه احساسی داشتم؟'],['n','چه چیزی نیاز داشتم؟'],['hp','چه چیزی کمکم کرد؟'],['pv','یادداشت خصوصی']].map(([f,l])=>`<label>${l}</label><textarea id="j_${f}">${esc(cf[f])}</textarea>`).join('')}
+ <button class="btn" style="margin-top:8px" data-a="jadd">ذخیره</button></div>
+ <div class="card"><h3>آخرین ثبت‌ها</h3>${last.map(j=>`<details><summary>${fmt(pd(j.d),{day:'numeric',month:'long'})} ${j.feel?'· '+esc(j.feel):''}</summary><p>${esc(j.h)}</p><p>${esc(j.f)}</p><p>${esc(j.n)}</p><p>${esc(j.hp)}</p><p class="mut">${esc(j.pv)}</p></details>`).join('')||'<span class="mut">هنوز چیزی ثبت نشده.</span>'}</div>`}
+
+function exportCSV(){const rows=[['تاریخ','نوع روز','انرژی','احساس','موفقیت','شکرگزاری','کارها']];Object.keys(S.days).sort().forEach(k=>{const d=S.days[k];rows.push([k,d.type,d.energy??'',d.feel,d.win,d.gr,d.tasks.map(t=>(t.done?'✓ ':'')+t.t).join(' | ')])});return rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n')}
+function vSet(){const names=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'],order=[6,0,1,2,3,4,5];
+ return `<h1 style="margin-top:18px">تنظیمات</h1>
+ <div class="card"><h2>نوع هر روز هفته</h2><div class="grid">${order.map(g=>`<div><label>${names[g===6?6:g]}</label><select data-p="set.kinds.${g}" data-n="1" data-r="1">${KINDS.map((n,i)=>`<option value="${i}"${S.set.kinds[g]===i?' selected':''}>${n}</option>`).join('')}</select></div>`).join('')}</div></div>
+ <div class="card"><h2>ساعت‌ها و زمان‌ها</h2><div class="grid">
+ <div><label>ساعت بیداری</label><input type="time" data-p="set.wake" value="${S.set.wake}"></div><div><label>شروع کار</label><input type="time" data-p="set.ws" value="${S.set.ws}"></div><div><label>پایان کار</label><input type="time" data-p="set.we" value="${S.set.we}"></div>
+ <div><label>زمان یادگیری (دقیقه، ۱۰ تا ۱۲۰)</label><input type="number" min="10" max="120" data-p="set.learn" data-n="1" data-r="1" value="${S.set.learn}"></div>
+ <div><label>زمان تولید محتوا (دقیقه، ۱۰ تا ۱۲۰)</label><input type="number" min="10" max="120" data-p="set.content" data-n="1" value="${S.set.content}"></div></div></div>
+ <div class="card"><h2>خروجی داده‌ها</h2><p class="mut">داده‌ها فقط در همین مرورگر ذخیره می‌شوند و با پاک‌کردن اطلاعات مرورگر از بین می‌روند. برای نگه‌داشتن نسخه پشتیبان، متن را کپی کن.</p>
+ <div class="row"><button class="btn q" data-a="ej">نمایش JSON</button><button class="btn q" data-a="ec">نمایش CSV</button><button class="btn" data-a="copy">کپی</button></div>
+ ${expText?`<textarea id="ex" dir="ltr" readonly style="min-height:160px;margin-top:8px">${esc(expText)}</textarea>`:''}</div>
+ ${syncCard()}<div class="card"><button class="btn q" data-a="reset">${resetAsk?'مطمئنی؟ دوباره بزن تا همه‌چیز پاک شود':'پاک‌کردن همه داده‌ها'}</button></div>`}
+
+const LOGS={pod:['پادکست','عنوان پادکست یا قسمت','min'],aud:['کتاب صوتی','نام کتاب','min'],ex:['ورزش','نوع فعالیت (پیاده‌روی، کشش…)','min'],med:['مدیتیشن','','min'],gr:['شکرگزاری','سپاسگزارم برای…','cnt'],jn:['ژورنال','عنوان (اختیاری)','cnt'],int:['نیت روز','نیت امروز من','cnt']};
+let lt='ov',ln=7;
+function fix(){S.log=S.log||{};S.custom=S.custom||[];S.custom.forEach(c=>{LOGS[c.id]=[c.t,c.kind==='min'?'عنوان فعالیت':'عنوان یا جمله',c.kind==='min'?'min':'cnt']});for(const k in LOGS)S.log[k]=S.log[k]||[];S.routines=S.routines||[];if(!S.ther)S.ther=THER0();if(!S.hb)S.hb=HB0();if(!S.wt)S.wt={logs:[],goal:'',hide:false};if(!S.ph)S.ph={logs:[],ideas:['وقت غذا گوشی کنار بماند','یک ساعت قبل از خواب گوشی دور از تخت باشد','اعلان‌های غیرضروری خاموش شوند','شب‌ها گوشی بیرون از اتاق خواب شارژ شود']}}
+function bars(v,unit){const mx=Math.max(1,...v),w=280/ln,X=i=>10+(ln-1-i)*w;return `<svg viewBox="0 0 300 80" style="width:100%" role="img" aria-label="نمودار"><path d="M10 62H290" stroke="var(--line)"/>${v.map((x,i)=>`<rect x="${X(i)+w*.15}" y="${62-x/mx*52}" width="${w*.7}" height="${x/mx*52}" rx="3" fill="var(--sage)"/>`).join('')}${ln===7?v.map((x,i)=>`<text x="${X(i)+w/2}" y="76" font-size="9" text-anchor="middle" fill="var(--mut)">${fmt(addD(new Date(),i-6),{weekday:'narrow'})}</text>`).join(''):''}</svg><p class="mut">مجموع: ${fa(v.reduce((a,b)=>a+b,0))} ${unit}</p>`}
+function ser(f){return [...Array(ln)].map((_,i)=>f(iso(addD(new Date(),i-ln+1))))}
+function logSum(key){const u=LOGS[key][2];return ser(k=>S.log[key].filter(e=>e.d===k).reduce((a,e)=>a+(u==='min'?e.m:1),0))}
+function vCalm(){
+ const tabs=`<div class="row" style="margin-top:14px"><button class="chip${lt==='ov'?' on':''}" data-a="lt" data-v="ov">نمای کلی</button>${Object.entries(LOGS).map(([k,v])=>`<button class="chip${lt===k?' on':''}" data-a="lt" data-v="${k}">${v[0]}</button>`).join('')}<button class="chip${lt==='hb'?' on':''}" data-a="lt" data-v="hb">علاقه‌های اختیاری<button class="chip${lt==='wt'?' on':''}" data-a="lt" data-v="wt">وزن</button><button class="chip${lt==='ph'?' on':''}" data-a="lt" data-v="ph">فاصله از گوشی</button></div>`;
+ const rng=`<div class="row"><button class="chip${ln===7?' on':''}" data-a="ln" data-v="7">هفته</button><button class="chip${ln===30?' on':''}" data-a="ln" data-v="30">ماه</button></div>`;
+ if(lt==='hb')return vHobby(tabs,rng);if(lt==='wt')return vWt(tabs);if(lt==='ph')return vPh(tabs,rng);
+ if(lt==='ov'){
+  const done=ser(k=>((S.days[k]||{}).tasks||[]).filter(t=>t.done).length);
+  return `<h1 style="margin-top:18px">روتین‌ها و نمودارها</h1><p class="mut">نمودارها فقط نشان می‌دهند چه کرده‌ای؛ هدف اجباری یا زنجیره‌ای در کار نیست و روزهای خالی هم اشکالی ندارند.</p>${tabs}${rng}`+
+  `<div class="grid">`+Object.entries(LOGS).map(([k,v])=>`<div class="card"><h3>${v[0]}</h3>${bars(logSum(k),v[2]==='min'?'دقیقه':'ثبت')}</div>`).join('')+
+  `<div class="card"><h3>کارهای انجام‌شده</h3>${bars(done,'کار')}</div></div>`+addRoutineCard()+
+  `<div class="card"><h3>محتوا و مسیر</h3><p class="mut">${ST.map(([s,l])=>l+': '+fa(S.cont.filter(c=>c.st===s).length)).join(' · ')}<br>مرحله‌های کامل‌شده مسیر یادگیری: ${fa(S.rm.filter(r=>r.st==='done').length)} از ${fa(STEPS.length)}</p></div>`}
+ if(S.custom.some(c=>c.id===lt&&c.kind==='chk'))return vChk(tabs,rng);
+ const [name,ph,u]=LOGS[lt],L=S.log[lt],isMed=lt==='med';
+ const form=isMed?`<label>روتین</label><select id="l1"><option value="">بدون روتین (آزاد)</option>${S.routines.map(r=>`<option>${esc(r.t)}</option>`).join('')}</select><label>مدت</label><select id="l2">${[1,3,5,10,15,20].map(m=>`<option value="${m}">${fa(m)} دقیقه</option>`).join('')}</select>`
+  :`<label>${u==='min'?'عنوان':'عنوان یا جمله'}</label><input type="text" id="l1" placeholder="${ph}">${u==='min'?'<label>مدت (دقیقه)</label><input type="number" id="l2" min="0" max="600" value="15">':''}`;
+ const routines=isMed?`<div class="card"><h2>روتین‌های خودم</h2><p class="mut">متن مدیتیشن را خودت بنویس؛ هر وقت خواستی همین‌جا بخوان و ویرایشش کن.</p>${S.routines.map((r,i)=>`<details><summary>${esc(r.t)}</summary><label>عنوان</label><input type="text" data-p="routines.${i}.t" value="${esc(r.t)}"><label>متن</label><textarea data-p="routines.${i}.text" style="min-height:140px">${esc(r.text)}</textarea><button class="ic" data-a="rdel" data-i="${i}">حذف روتین</button></details>`).join('')||'<p class="mut">هنوز روتینی ننوشته‌ای.</p>'}<label>عنوان روتین تازه</label><input type="text" id="r1"><label>متن روتین</label><textarea id="r2" style="min-height:120px"></textarea><button class="btn" style="margin-top:8px" data-a="radd">افزودن روتین</button></div>`:'';
+ return `<h1 style="margin-top:18px">${name}</h1>${tabs}<div class="card"><h3>نمودار</h3>${rng}${bars(logSum(lt),u==='min'?'دقیقه':'ثبت')}</div>${routines}
+ <div class="card"><h2>ثبت تازه</h2>${lt==='ex'?'<p class="note">هر مقدار کافی است؛ حتی ۱۰ دقیقه کشش.</p>':''}${form}<label>${u==='cnt'?'متن':'یادداشت یا احساس بعد از آن'}</label><textarea id="l3"></textarea>${msg?`<div class="mut" role="alert">${msg}</div>`:''}<button class="btn" style="margin-top:8px" data-a="ladd">ذخیره</button></div>
+ <div class="card"><h3>آخرین ثبت‌ها</h3>${L.slice(-8).reverse().map(e=>`<details><summary>${fmt(pd(e.d),{day:'numeric',month:'long'})}${e.t?' · '+esc(e.t):''}${u==='min'?' · '+fa(e.m)+' دقیقه':''}</summary><p>${esc(e.n)}</p><button class="ic" data-a="ldel" data-id="${e.id}">حذف</button></details>`).join('')||'<span class="mut">خالی</span>'}</div>`}
+function THER0(){return{logs:[],ex:[{id:'anx',t:'نوشتن دلیل اضطراب',kind:'write',prompts:['دلیل اضطراب من الان این است…']},{id:'dg',t:'سه‌تا دمت گرم امروز',kind:'write',prompts:['دمت گرم برای… (۱)','دمت گرم برای… (۲)','دمت گرم برای… (۳)']},{id:'b1',t:'تنفس مربعی ۴-۴-۴-۴',kind:'breath',pat:[4,4,4,4],rounds:5},{id:'b2',t:'تنفس ۴-۷-۸',kind:'breath',pat:[4,7,8,0],rounds:4},{id:'b3',t:'دم کوتاه، بازدم بلند',kind:'breath',pat:[4,0,6,0],rounds:6}]}}
+let br=null,delAsk='';
+function brStart(id){const e=S.ther.ex.find(x=>x.id===id),ph=[['دم',e.pat[0]],['نگه‌دار',e.pat[1]],['بازدم',e.pat[2]],['مکث',e.pat[3]]].filter(p=>p[1]>0);br={id,ph,i:0,left:ph[0][1],round:1,rounds:e.rounds||5,sc:.55};br.iv=setInterval(brTick,1000);setTimeout(brUI,30)}
+function brTick(){br.left--;if(br.left<=0){br.i++;if(br.i>=br.ph.length){br.i=0;br.round++;if(br.round>br.rounds){brStop(true);return}}br.left=br.ph[br.i][1]}brUI()}
+function brStop(done){clearInterval(br.iv);const id=br.id;br=null;if(done){S.ther.logs.push({id:uid(),d:today(),ex:id,vals:[]});save();msg='تمام شد و ثبت شد. همین کافی است.'}render()}
+function brUI(){const t=$('#brtxt');if(!br||!t)return;const p=br.ph[br.i];t.innerHTML=p[0]+'<br><small>'+fa(br.left)+'</small>';$('#brr').textContent='دور '+fa(br.round)+' از '+fa(br.rounds);if(br.lI!==br.i||br.lR!==br.round){br.lI=br.i;br.lR=br.round;const n=p[0];br.sc=n==='دم'?1:(n==='بازدم'||n==='مکث')?.55:br.sc;const c=$('#brc');c.style.transition=matchMedia('(prefers-reduced-motion:reduce)').matches?'none':'transform '+p[1]+'s linear';c.style.transform='scale('+br.sc+')'}}
+function vTher(){const T=S.ther,L=l=>T.logs.filter(e=>e.ex===l);
+ const rng=`<div class='row'><button class='chip${ln===7?' on':''}' data-a='ln' data-v='7'>هفته</button><button class='chip${ln===30?' on':''}' data-a='ln' data-v='30'>ماه</button></div>`;
+ return `<h1 style='margin-top:18px'>تمرین‌های تراپی</h1><p class='note'>این‌ها تمرین‌هایی‌اند که تراپیستت داده. متن، زمان‌ها و تعداد دورها را مطابق گفتهٔ او تنظیم کن؛ هر تمرینی هم که بعداً داد، پایین صفحه اضافه کن. اگر هنگام تنفس سرگیج شدی، به تنفس عادی برگرد. این برنامه جای درمان نیست.</p>${msg?`<div class='mut' role='alert'>${msg}</div>`:''}${rng}`+
+ T.ex.map(x=>{const lg=L(x.id);return `<div class='card'><h2>${esc(x.t)}</h2>`+(x.kind==='write'?x.prompts.map((p,j)=>`<label>${esc(p)}</label><textarea id='t_${x.id}_${j}'></textarea>`).join('')+`<button class='btn' style='margin-top:8px' data-a='tadd' data-id='${x.id}'>ذخیره</button>`:
+  (br&&br.id===x.id?`<div style='text-align:center'><div style='height:190px;display:grid;place-items:center'><div id='brc' style='width:170px;height:170px;border-radius:50%;background:var(--sage);display:grid;place-items:center;transform:scale(${br.sc})'><b id='brtxt' style='color:#26301a;font-size:1.3rem;line-height:1.4'></b></div></div><p class='mut' id='brr'></p><button class='btn q' data-a='bstop'>توقف</button></div>`:`<p class='mut'>دم ${fa(x.pat[0])} · نگه‌داشتن ${fa(x.pat[1])} · بازدم ${fa(x.pat[2])} · مکث ${fa(x.pat[3])} ثانیه، ${fa(x.rounds)} دور</p><button class='btn' data-a='bst' data-id='${x.id}'>شروع</button>`))+
+  `<div style='margin-top:10px'>${bars(ser(k=>lg.filter(e=>e.d===k).length),'بار')}</div>`+(x.kind==='write'?lg.slice(-5).reverse().map(e=>`<details><summary>${fmt(pd(e.d),{day:'numeric',month:'long'})}</summary>${e.vals.map(v=>v?`<p>${esc(v)}</p>`:'').join('')}<button class='ic' data-a='tdel' data-id='${e.id}'>حذف</button></details>`).join(''):'')+`</div>`}).join('')+
+ `<div class='card'><details><summary>ویرایش و افزودن تمرین</summary>`+T.ex.map((x,i)=>`<details><summary>${esc(x.t)}</summary><label>عنوان</label><input type='text' data-p='ther.ex.${i}.t' data-r='1' value='${esc(x.t)}'>`+(x.kind==='breath'?`<div class='grid'>${['دم','نگه‌داشتن','بازدم','مکث'].map((l,j)=>`<div><label>${l} (ثانیه)</label><input type='number' min='${j?0:1}' max='30' data-n='1' data-p='ther.ex.${i}.pat.${j}' value='${x.pat[j]}'></div>`).join('')}<div><label>تعداد دور</label><input type='number' min='1' max='30' data-n='1' data-p='ther.ex.${i}.rounds' value='${x.rounds}'></div></div>`:`<label>سؤال‌ها (هر خط یکی)</label><textarea data-pr='${x.id}'>${esc(x.prompts.join('\n'))}</textarea>`)+`<button class='ic' data-a='xdel' data-id='${x.id}'>${delAsk===x.id?'مطمئنی؟ دوباره بزن':'حذف تمرین'}</button></details>`).join('')+
+ `<h3 style='margin-top:12px'>تمرین تازه</h3><label>عنوان</label><input type='text' id='x1'><label>نوع</label><select id='x2'><option value='write'>نوشتنی</option><option value='breath'>تنفس (بعداً الگو را تنظیم کن)</option></select><label>سؤال‌ها برای نوع نوشتنی (هر خط یکی)</label><textarea id='x3'></textarea><button class='btn' style='margin-top:8px' data-a='xadd'>افزودن تمرین</button></details></div>`}
+let hopen='';
+function addRoutineCard(){return `<div class='card'><h2>روتین تازهٔ خودم</h2><label>نام روتین</label><input type='text' id='cn1' placeholder='مثلاً روتین صبح، خواندن قرآن، آب خوردن…'><label>نوع</label><select id='cn2'><option value='chk'>چک‌لیست روزانه (قدم‌هایی که تیک می‌زنم)</option><option value='min'>مدت‌دار (ثبت دقیقه)</option><option value='cnt'>نوشتنی یا تعدادی</option></select><label>قدم‌ها برای نوع چک‌لیست (هر خط یکی)</label><textarea id='cn3'></textarea>${msg?`<div class='mut' role='alert'>${msg}</div>`:''}<button class='btn' style='margin-top:8px' data-a='ucadd'>افزودن روتین</button>${S.custom.length?`<h3 style='margin-top:14px'>روتین‌هایی که ساخته‌ام</h3>`+S.custom.map(c=>`<div class='row'><span style='flex:1'>${esc(c.t)}</span><button class='ic' data-a='ucdel' data-id='${c.id}'>${delAsk===c.id?'مطمئنی؟ دوباره بزن':'حذف'}</button></div>`).join(''):''}</div>`}
+function vChk(tabs,rng){const c=S.custom.find(x=>x.id===lt),L=S.log[lt],td=today();return `<h1 style='margin-top:18px'>${esc(c.t)}</h1>${tabs}<div class='card'><h3>امروز</h3><p class='mut'>هر قدمی که دلت خواست تیک بزن؛ قدم‌های تیک‌نخورده هیچ مشکلی ندارند.</p><ul>${c.steps.map((s,i)=>{const dn=L.some(e=>e.d===td&&e.t===s);return `<li class='tk${dn?' dn':''}'><input type='checkbox' data-a='uctog' data-i='${i}' ${dn?'checked':''} aria-label='انجام شد'><span class='tx' style='flex:1;padding:7px 10px'>${esc(s)}</span><button class='ic' data-a='ucstdel' data-i='${i}' aria-label='حذف قدم'>✕</button></li>`}).join('')}</ul><div class='row' style='margin-top:8px'><input type='text' id='cs1' placeholder='قدم تازه…' style='flex:1'><button class='btn q' data-a='ucstadd'>+</button></div></div><div class='card'><h3>نمودار</h3>${rng}${bars(logSum(lt),'قدم')}</div>`}
+let sy={st:'off',doc:null,last:0,tm:null};
+function syTxt(){return sy.st==='on'?'همگام‌سازی فعال است'+(sy.last?' · آخرین ارسال: '+fmt(new Date(sy.last),{hour:'numeric',minute:'numeric'}):''):sy.st==='err'?'خطا در همگام‌سازی؛ داده‌ها هنوز در این مرورگر هستند.':'همگام‌سازی در دسترس نیست (فقط همین مرورگر).'}
+function syncCard(){let bk=false;try{bk=!!localStorage.getItem(KEY+'-backup')}catch(e){}return `<div class='card'><h2>گوشی و لپ‌تاپ</h2><p id='sy'>${syTxt()}</p><p class='mut'>برای دیدن همین داده‌ها روی دستگاه دیگر، همین لینک را با همین حساب Claude باز کن. اگر هر دو دستگاه هنوز دادهٔ جداگانه دارند، اول از دستگاهی که دادهٔ بیشتری دارد بازش کن؛ آن دیگری با نسخهٔ ابر جایگزین می‌شود (پشتیبان محلی نگه داشته می‌شود). اگر همزمان روی دو دستگاه ویرایش کنی، آخرین تغییر ماندنی است.</p><div class='row'><button class='btn q' data-a='spush'>ارسال از این دستگاه</button><button class='btn q' data-a='spull'>دریافت از ابر</button>${bk?`<button class='btn q' data-a='srest'>بازگرداندن پشتیبان محلی</button>`:''}</div></div>`}
+function syncSoon(){if(!sy.doc)return;clearTimeout(sy.tm);sy.tm=setTimeout(pushNow,1500)}
+async function pushNow(){if(!sy.doc)return;try{S.ts=S.ts||Date.now();const j=JSON.stringify(S);if(j.length>230000){sy.st='err';warn='حجم داده‌ها از حد همگام‌سازی بیشتر شده؛ بهتر است از تنظیمات خروجی بگیری و ثبت‌های قدیمی را پاک کنی.';render();return}await sy.doc.set({json:j,t:S.ts});sy.last=Date.now();sy.st='on'}catch(e){sy.st='err'}const el=$('#sy');if(el)el.textContent=syTxt()}
+function applyRemote(d,force){const t=+d.t||0;if(!d.json)return;if(!force&&!S.fresh&&t<=(S.ts||0))return;const ae=document.activeElement;if(ae&&/INPUT|TEXTAREA/.test(ae.tagName)&&!force){setTimeout(()=>applyRemote(d),3000);return}let r;try{r=JSON.parse(d.json)}catch(e){return}if(!S.fresh){try{localStorage.setItem(KEY+'-backup',JSON.stringify(S))}catch(e){}}S=r;S.ts=t;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}render()}
+async function syncInit(){try{if(!window.claude)return;const db=await claude.use('db'),us=await claude.use('user');if(!db||!us)return;const id=await us.id();if(!id)return;sy.doc=db.doc('data/users/'+id+'/state');sy.st='on';const snap=await sy.doc.get();if(snap.exists)applyRemote(snap.data());else if(!S.fresh)pushNow();sy.doc.onSnapshot(s=>{if(s.exists&&!s.metadata.hasPendingWrites)applyRemote(s.data())},()=>{sy.st='err'});render()}catch(e){sy.st='err'}}
+function wchart(){const W=S.wt,lg=W.logs.slice().sort((a,b)=>a.d<b.d?-1:1).slice(-30);if(!lg.length)return '<p class="mut">هنوز وزنی ثبت نشده.</p>';const ts=lg.map(l=>pd(l.d).getTime()),t0=ts[0],t1=ts[ts.length-1],g=+W.goal>0?+W.goal:null,vs=lg.map(l=>l.w).concat(g?[g]:[]),lo=Math.min(...vs)-.5,hi=Math.max(...vs)+.5,X=t=>t1===t0?150:290-(t-t0)/(t1-t0)*280,Y=v=>90-(v-lo)/(hi-lo)*80;return `<svg viewBox='0 0 300 100' style='width:100%' role='img' aria-label='نمودار وزن'><path d='M10 95H290' stroke='var(--line)'/>${g?`<path d='M10 ${Y(g)}H290' stroke='var(--orange)' stroke-dasharray='4 4'/>`:''}<path d='${lg.map((l,i)=>(i?'L':'M')+X(ts[i])+' '+Y(l.w)).join('')}' fill='none' stroke='var(--olive)' stroke-width='2'/>${lg.map((l,i)=>`<circle cx='${X(ts[i])}' cy='${Y(l.w)}' r='3' fill='var(--olive)'/>`).join('')}</svg>`}
+function vWt(tabs){const W=S.wt,av=(a,b)=>{const x=W.logs.filter(l=>l.d>=iso(addD(new Date(),-a))&&l.d<=iso(addD(new Date(),-b)));return x.length?x.reduce((s,l)=>s+l.w,0)/x.length:null},r=av(6,0),p=av(13,7),f=v=>fa(+v.toFixed(1));
+ return `<h1 style='margin-top:18px'>وزن</h1>${tabs}<p class='note'>اینجا فقط ثبت می‌شود؛ رژیم یا عدد هدف پیشنهاد نمی‌دهم. اگر افزایش وزن برایت از نظر سلامتی مهم است، هدف و برنامه‌اش را با پزشک یا متخصص تغذیه مشخص کن. وزن روزبه‌روز بالا و پایین می‌شود و عادی است؛ به روند چند هفته نگاه کن. اگر وزن‌کشی استرس می‌دهد، هفته‌ای یک بار هم کافی است.</p>${msg?`<div class='mut' role='alert'>${msg}</div>`:''}<div class='card'><h3>روند</h3>${wchart()}${W.hide?`<p class='mut'>عددها پنهان‌اند.</p>`:`<p class='mut'>${r!=null?'میانگین هفتهٔ اخیر: '+f(r)+' کیلو':'هفتهٔ اخیر وزنی ثبت نشده'}${p!=null?' · هفتهٔ قبل از آن: '+f(p)+' کیلو':''}</p>`}<label>هدف من (کیلو، اختیاری و با نظر متخصص)</label><input type='number' min='20' max='300' step='0.1' data-n='1' data-p='wt.goal' data-r='1' value='${esc(W.goal)}'><button class='btn q' style='margin-top:8px' data-a='wh'>${W.hide?'نمایش عددها':'پنهان‌کردن عددها'}</button></div><div class='card'><h2>ثبت وزن</h2><label>وزن (کیلوگرم)</label><input type='number' id='wv' min='20' max='300' step='0.1'><label>یادداشت (اختیاری: حال، خواب، غذا…)</label><input type='text' id='wn'><button class='btn' style='margin-top:8px' data-a='wtadd'>ذخیره</button></div><div class='card'><h3>آخرین ثبت‌ها</h3>${W.logs.slice(-6).reverse().map(l=>`<p class='mut' style='margin:2px 0'>${fmt(pd(l.d),{day:'numeric',month:'long'})}${W.hide?'':' · '+f(l.w)+' کیلو'} ${esc(l.n)} <button class='ic' data-a='wdel' data-id='${l.id}'>حذف</button></p>`).join('')||'<span class="mut">خالی</span>'}</div>`}
+function vPh(tabs,rng){const P=S.ph;return `<h1 style='margin-top:18px'>فاصله از گوشی</h1>${tabs}<p class='note'>هدف سبک‌تر شدن فشار گوشی است، نه تنبیه. برنامه به گوشی دسترسی ندارد؛ زمان صفحه را خودت از بخش «سلامت دیجیتال» یا «Screen Time» گوشی می‌خوانی و اینجا می‌نویسی. وارد کردن عدد اختیاری است.</p>${msg?`<div class='mut' role='alert'>${msg}</div>`:''}<div class='card'><h3>زمان صفحه (دقیقه)</h3>${rng}${bars(ser(k=>P.logs.filter(l=>l.d===k).reduce((a,l)=>a+l.sc,0)),'دقیقه')}<h3 style='margin-top:10px'>لحظه‌های بدون گوشی (دقیقه)</h3>${bars(ser(k=>P.logs.filter(l=>l.d===k).reduce((a,l)=>a+l.fr,0)),'دقیقه')}</div><div class='card'><h2>ثبت امروز</h2><div class='grid'><div><label>زمان صفحه امروز (دقیقه)</label><input type='number' id='ps' min='0' max='1440'></div><div><label>مدت بدون گوشی (دقیقه)</label><input type='number' id='pf' min='0' max='1440'></div></div><label>یادداشت (چه چیزی کمک کرد؟)</label><input type='text' id='pn'><button class='btn' style='margin-top:8px' data-a='padd'>ذخیره</button></div><div class='card'><h3>ایده‌هایی که می‌خواهم امتحان کنم</h3><ul>${P.ideas.map((t,j)=>`<li class='tk'><input type='text' class='tx' data-p='ph.ideas.${j}' value='${esc(t)}'><button class='ic' data-a='pidel' data-i='${j}' aria-label='حذف'>✕</button></li>`).join('')}</ul><div class='row' style='margin-top:8px'><input type='text' id='pi' placeholder='ایدهٔ تازه…' style='flex:1'><button class='btn q' data-a='pidea'>+</button></div></div><div class='card'><h3>ثبت‌های اخیر</h3>${P.logs.slice(-6).reverse().map(l=>`<p class='mut' style='margin:2px 0'>${fmt(pd(l.d),{day:'numeric',month:'long'})} · صفحه ${fa(l.sc)} · بدون گوشی ${fa(l.fr)} ${esc(l.n)} <button class='ic' data-a='pdel' data-id='${l.id}'>حذف</button></p>`).join('')||'<span class="mut">خالی</span>'}</div>`}
+document.addEventListener('toggle',e=>{const h=e.target.dataset&&e.target.dataset.hid;if(h){if(e.target.open)hopen=h;else if(hopen===h)hopen=''}},true);
+function HB0(){const s=a=>a.map(t=>({t,done:false}));return{items:[{id:'dub',t:'دوبله',note:'',steps:s(['یک صحنهٔ کوتاه را بدون صدا ببین','متن همان صحنه را با ریتم لب‌ها بخوان','یک نسخهٔ ساده با گوشی ضبط کن']),logs:[]},{id:'vo',t:'صداسازی',note:'',steps:s(['یک صدا یا شخصیت ساده را تقلید کن','سی ثانیه ضبط کن و گوش بده','چند دقیقه گرم‌کردن صدا و تنفس']),logs:[]},{id:'hp',t:'هنگ‌درام / هندپن',note:'',steps:s(['با نت‌ها و گام ساز آشنا شو','یک الگوی ریتم ساده بزن','یک قطعهٔ کوتاه یاد بگیر']),logs:[]}]}}
+function vHobby(tabs,rng){const H=S.hb.items,mins=(x,k)=>x.logs.filter(l=>l.d===k).reduce((p,l)=>p+l.m,0);
+ return `<h1 style='margin-top:18px'>علاقه‌های اختیاری</h1>${tabs}<p class='note'>این بخش کاملاً اختیاری است: خودکار وارد برنامهٔ روزانه یا پیشنهادها نمی‌شود و هدف یا مهلتی ندارد. قدم‌ها نمونه‌اند و هر کدام را می‌توانی عوض کنی. هر چیز دیگری هم دوست داشتی، پایین اضافه کن.</p>${msg?`<div class='mut' role='alert'>${msg}</div>`:''}<div class='card'><h3>همهٔ علاقه‌ها کنار هم</h3>${rng}${bars(ser(k=>H.reduce((a,x)=>a+mins(x,k),0)),'دقیقه')}</div>`+
+ H.map((x,i)=>`<div class='card'><details data-hid='${x.id}' ${hopen===x.id?'open':''}><summary>${esc(x.t)} <span class='mut'>${fa(x.logs.reduce((a,l)=>a+l.m,0))} دقیقه تا امروز</span></summary><label>نام</label><input type='text' data-p='hb.items.${i}.t' data-r='1' value='${esc(x.t)}'><label>یادداشت (منبع، ایده، استاد…)</label><textarea data-p='hb.items.${i}.note'>${esc(x.note)}</textarea><label>قدم‌های کوچک</label><ul>${x.steps.map((s,j)=>`<li class='tk${s.done?' dn':''}'><input type='checkbox' data-p='hb.items.${i}.steps.${j}.done' data-r='1' ${s.done?'checked':''} aria-label='انجام شد'><input type='text' class='tx' data-p='hb.items.${i}.steps.${j}.t' value='${esc(s.t)}'><button class='ic' data-a='hsdel' data-i='${i}' data-j='${j}' aria-label='حذف'>✕</button></li>`).join('')}</ul><div class='row'><input type='text' id='hs_${i}' placeholder='قدم کوچک تازه…' style='flex:1'><button class='btn q' data-a='hstep' data-i='${i}'>+</button></div><label>ثبت تمرین</label><div class='row'><input type='number' id='hm_${i}' min='1' max='600' value='15' style='width:90px' aria-label='دقیقه'><input type='text' id='hn_${i}' placeholder='یادداشت کوتاه (اختیاری)' style='flex:1'><button class='btn' data-a='hlog' data-i='${i}'>ثبت</button></div><div style='margin-top:10px'>${bars(ser(k=>mins(x,k)),'دقیقه')}</div>${x.logs.slice(-5).reverse().map(l=>`<p class='mut' style='margin:2px 0'>${fmt(pd(l.d),{day:'numeric',month:'long'})} · ${fa(l.m)} دقیقه ${esc(l.n)} <button class='ic' data-a='hld' data-i='${i}' data-id='${l.id}'>حذف</button></p>`).join('')}<div class='row' style='margin-top:10px'><button class='btn q' data-a='htoday' data-i='${i}'>افزودن یک تمرین کوچک به امروز</button><button class='ic' data-a='hdel' data-id='${x.id}'>${delAsk===x.id?'مطمئنی؟ دوباره بزن':'حذف این علاقه'}</button></div></details></div>`).join('')+
+ `<div class='card'><h3>علاقهٔ تازه</h3><div class='row'><input type='text' id='hnew' placeholder='مثلاً نقاشی، آواز، فیلم‌برداری…' style='flex:1'><button class='btn' data-a='hadd'>افزودن</button></div></div>`}
+function render(){fix();const f=document.activeElement&&document.activeElement.id;
+ const fn={today:vToday,week:vWeek,road:vRoad,content:vContent,mood:vMood,calm:vCalm,ther:vTher,set:vSet}[view];
+ $('#app').innerHTML=(warn?`<p class="note" role="alert" style="margin-top:10px">${warn}</p>`:'')+fn();
+ $('#nav').innerHTML=VIEWS.map(([v,l])=>`<button class="${v===view?'on':''}" data-a="nav" data-v="${v}">${l}</button>`).join('');
+ if(f){const e=document.getElementById(f);if(e&&e.focus)e.focus()}}
+function setp(path,v){const p=path.split('.');let o=S;for(let i=0;i<p.length-1;i++)o=o[p[i]]??(o[p[i]]={});o[p[p.length-1]]=v;save()}
+
+document.addEventListener('change',e=>{const el=e.target;
+ if(el.dataset.p){let v=el.type==='checkbox'?el.checked:el.dataset.n?Math.max(+el.min||0,Math.min(+el.max||99999,+el.value||0)):el.type==='range'?+el.value:el.value;if(el.dataset.n&&el.type==='number')el.value=v;setp(el.dataset.p,v);if(el.dataset.r)render()}
+ else if(el.dataset.mv){const[k,i]=el.dataset.mv.split('|');if(el.value){const t=D(k).tasks.splice(+i,1)[0];D(el.value).tasks.push(t);save();render()}}
+ else if(el.dataset.ci){S.cont.find(c=>c.id===el.dataset.ci).st=el.value;save();render()}
+ else if(el.dataset.pr){const x=S.ther.ex.find(e=>e.id===el.dataset.pr);x.prompts=el.value.split('\n').map(s=>s.trim()).filter(Boolean);save()}
+ else if(el.id==='tmsel'){tm.left=+el.value*60;$('#tm').textContent=tmTxt()}});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,k=b.dataset.k,i=+b.dataset.i;msg='';
+ if(a==='nav'){if(br)brStop(false);view=b.dataset.v;resetAsk=false;scrollTo(0,0)}
+ else if(a==='type'){const d=D(today());d.type=d.type===b.dataset.v?'':b.dataset.v;showAll=false;save()}
+ else if(a==='feel'){const d=D(today());d.feel=d.feel===b.dataset.v?'':b.dataset.v;save()}
+ else if(a==='add'){const t=$('#nt').value.trim();if(!t){msg='بنویس چه کاری اضافه شود.'}else{D(k).tasks.push({id:uid(),t,cat:$('#nc').value,done:false,p:false});save()}}
+ else if(a==='wadd'){const inp=document.querySelector(`[data-wk="${k}"]`),t=inp.value.trim();if(t){D(k).tasks.push({id:uid(),t,cat:'personal',done:false,p:false});save()}}
+ else if(a==='del'){D(k).tasks.splice(i,1);save()}
+ else if(a==='pri'){const t=D(k).tasks[i];if(!t.p&&D(k).tasks.filter(x=>x.p).length>=3){msg='حداکثر سه اولویت؛ اول یکی را بردار.'}else{t.p=!t.p;save()}}
+ else if(a==='tmr'){const t=D(k).tasks.splice(i,1)[0];t.done=false;t.p=false;D(iso(addD(pd(k),1))).tasks.push(t);save();msg='به فردا رفت. هیچ مشکلی نیست.'}
+ else if(a==='showall'){showAll=!showAll}
+ else if(a==='sug'){const cs=curStep();D(today()).tasks.push({id:uid(),t:STEPS[cs][3],cat:'learn',done:false,p:false});save()}
+ else if(a==='tm'){if(tm.run){clearInterval(tm.iv);tm.run=false}else{tm.run=true;tm.iv=setInterval(()=>{tm.left--;const x=$('#tm');if(x)x.textContent=tmTxt();if(tm.left<=0){clearInterval(tm.iv);tm.run=false;tm.left=25*60;render();msg='زمان تمام شد. یک نفس عمیق بکش.'}},1000)}}
+ else if(a==='idea'){S.cont.push({id:uid(),topic:'آموخته‌ام از «'+STEPS[i][0]+'»',plat:'',fmt:'پست',script:STEPS[i][3]+' — '+STEPS[i][4],date:'',link:'',st:'idea'});save();view='content'}
+ else if(a==='cadd'){const t=$('#c1').value.trim();if(!t){msg='موضوع را بنویس.'}else{S.cont.push({id:uid(),topic:t,plat:$('#c2').value.trim(),fmt:$('#c3').value,date:$('#c4').value,link:$('#c5').value.trim(),script:$('#c6').value,st:'idea'});save()}}
+ else if(a==='cdel'){S.cont=S.cont.filter(c=>c.id!==b.dataset.id);save()}
+ else if(a==='cn'){chartN=+b.dataset.v}
+ else if(a==='cfeel'){cf.ch=cf.ch===b.dataset.v?'':b.dataset.v}
+ else if(a==='jadd'){['h','f','n','hp','pv'].forEach(x=>cf[x]=$('#j_'+x).value);if(!cf.ch&&!cf.f&&!cf.h&&!cf.n&&!cf.hp&&!cf.pv){msg='';}else{S.jr.push({d:today(),feel:cf.ch||'',h:cf.h||'',f:cf.f||'',n:cf.n||'',hp:cf.hp||'',pv:cf.pv||''});save();cf={};}}
+ else if(a==='wtadd'){const w=+$('#wv').value;if(!(w>=20&&w<=300)){msg='وزن را به کیلوگرم و بین ۲۰ تا ۳۰۰ وارد کن.'}else{S.wt.logs.push({id:uid(),d:today(),w:Math.round(w*10)/10,n:$('#wn').value.trim()});save()}}
+ else if(a==='wdel'){S.wt.logs=S.wt.logs.filter(l=>l.id!==b.dataset.id);save()}
+ else if(a==='wh'){S.wt.hide=!S.wt.hide;save()}
+ else if(a==='padd'){const sc=Math.max(0,Math.min(1440,+$('#ps').value||0)),fr=Math.max(0,Math.min(1440,+$('#pf').value||0)),n=$('#pn').value.trim();if(!sc&&!fr&&!n){msg='حداقل یک مورد را وارد کن.'}else{S.ph.logs.push({id:uid(),d:today(),sc,fr,n});save()}}
+ else if(a==='pdel'){S.ph.logs=S.ph.logs.filter(l=>l.id!==b.dataset.id);save()}
+ else if(a==='pidea'){const t=$('#pi').value.trim();if(t){S.ph.ideas.push(t);save()}}
+ else if(a==='pidel'){S.ph.ideas.splice(i,1);save()}
+ else if(a==='hadd'){const t=$('#hnew').value.trim();if(!t){msg='اسم علاقه را بنویس.'}else{S.hb.items.push({id:uid(),t,note:'',steps:[],logs:[]});save()}}
+ else if(a==='hdel'){if(delAsk===b.dataset.id){S.hb.items=S.hb.items.filter(x=>x.id!==b.dataset.id);delAsk=''}else delAsk=b.dataset.id}
+ else if(a==='hstep'){hopen=S.hb.items[i].id;const t=$('#hs_'+i).value.trim();if(t){S.hb.items[i].steps.push({t,done:false});save()}}
+ else if(a==='hsdel'){hopen=S.hb.items[i].id;S.hb.items[i].steps.splice(+b.dataset.j,1);save()}
+ else if(a==='hlog'){hopen=S.hb.items[i].id;const m=Math.max(1,Math.min(600,+$('#hm_'+i).value||0));S.hb.items[i].logs.push({id:uid(),d:today(),m,n:$('#hn_'+i).value.trim()});save()}
+ else if(a==='hld'){hopen=S.hb.items[i].id;S.hb.items[i].logs=S.hb.items[i].logs.filter(l=>l.id!==b.dataset.id);save()}
+ else if(a==='htoday'){hopen=S.hb.items[i].id;D(today()).tasks.push({id:uid(),t:'تمرین کوچک: '+S.hb.items[i].t,cat:'personal',done:false,p:false});save();msg='به امروز اضافه شد؛ هر وقت خواستی حذفش کن.'}
+ else if(a==='bst'){brStart(b.dataset.id)}else if(a==='bstop'){brStop(false)}
+ else if(a==='tadd'){const x=S.ther.ex.find(e=>e.id===b.dataset.id),vals=x.prompts.map((_,j)=>$('#t_'+x.id+'_'+j).value.trim());if(!vals.some(Boolean)){msg='یک چیزی بنویس، هر چند کوتاه.'}else{S.ther.logs.push({id:uid(),d:today(),ex:x.id,vals});save();msg='ذخیره شد. همین کافی است.'}}
+ else if(a==='tdel'){S.ther.logs=S.ther.logs.filter(l=>l.id!==b.dataset.id);save()}
+ else if(a==='xadd'){const t=$('#x1').value.trim(),kd=$('#x2').value,pr=$('#x3').value.split('\n').map(s=>s.trim()).filter(Boolean);if(!t||(kd==='write'&&!pr.length)){msg='عنوان بنویس؛ برای تمرین نوشتنی حداقل یک سؤال هم لازم است.'}else{S.ther.ex.push(kd==='write'?{id:uid(),t,kind:'write',prompts:pr}:{id:uid(),t,kind:'breath',pat:[4,0,6,0],rounds:5});save()}}
+ else if(a==='xdel'){if(delAsk===b.dataset.id){S.ther.ex=S.ther.ex.filter(x=>x.id!==b.dataset.id);delAsk=''}else delAsk=b.dataset.id}
+ else if(a==='ucadd'){const t=$('#cn1').value.trim(),kd=$('#cn2').value,st=$('#cn3').value.split('\n').map(s=>s.trim()).filter(Boolean);if(!t||(kd==='chk'&&!st.length)){msg='اسم روتین را بنویس؛ برای چک‌لیست حداقل یک قدم هم لازم است.'}else{const id='c'+uid();S.custom.push({id,t,kind:kd,steps:st});lt=id;save()}}
+ else if(a==='ucdel'){const id=b.dataset.id;if(delAsk===id){S.custom=S.custom.filter(c=>c.id!==id);delete S.log[id];delete LOGS[id];delAsk='';if(lt===id)lt='ov';save()}else delAsk=id}
+ else if(a==='uctog'){const c=S.custom.find(x=>x.id===lt),s=c.steps[i],L=S.log[lt],j=L.findIndex(e=>e.d===today()&&e.t===s);if(j>=0)L.splice(j,1);else L.push({id:uid(),d:today(),t:s,m:0,n:''});save()}
+ else if(a==='ucstadd'){const c=S.custom.find(x=>x.id===lt),t=$('#cs1').value.trim();if(t){c.steps.push(t);save()}}
+ else if(a==='ucstdel'){S.custom.find(x=>x.id===lt).steps.splice(i,1);save()}
+ else if(a==='spush'){S.ts=Date.now();delete S.fresh;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(x){}pushNow();msg='نسخهٔ این دستگاه به ابر فرستاده شد.'}
+ else if(a==='spull'){if(sy.doc)sy.doc.get().then(s=>{if(s.exists)applyRemote(s.data(),true);else{warn='نسخه‌ای در ابر نیست.';render()}})}
+ else if(a==='srest'){try{const r=JSON.parse(localStorage.getItem(KEY+'-backup'));if(r&&r.set){S=r;save();msg='پشتیبان محلی بازگردانده شد.'}}catch(x){msg='پشتیبان خوانده نشد.'}}
+ else if(a==='lt'){lt=b.dataset.v}else if(a==='ln'){ln=+b.dataset.v}
+ else if(a==='ladd'){const t=($('#l1').value||'').trim(),m=$('#l2')?Math.max(0,Math.min(600,+$('#l2').value||0)):0,n=$('#l3').value.trim(),u=LOGS[lt][2];if((u==='min'&&lt!=='med'&&!t)||(u==='cnt'&&!t&&!n)){msg='یک عنوان یا چند کلمه بنویس.'}else{S.log[lt].push({id:uid(),d:today(),t,m,n});save()}}
+ else if(a==='ldel'){S.log[lt]=S.log[lt].filter(e=>e.id!==b.dataset.id);save()}
+ else if(a==='radd'){const t=$('#r1').value.trim(),x=$('#r2').value.trim();if(!t||!x){msg='هم عنوان و هم متن روتین را بنویس.'}else{S.routines.push({t,text:x});save()}}
+ else if(a==='rdel'){S.routines.splice(i,1);save()}
+ else if(a==='ej'){expText=JSON.stringify(S,null,2)}
+ else if(a==='ec'){expText='\ufeff'+exportCSV()}
+ else if(a==='copy'){try{navigator.clipboard.writeText(expText||JSON.stringify(S,null,2));msg='کپی شد'}catch(x){const t=$('#ex');if(t){t.select()}}}
+ else if(a==='reset'){if(resetAsk){try{localStorage.removeItem(KEY)}catch(x){}S=init();S.set.kinds=[0,0,0,0,1,2,0];save();resetAsk=false;view='today'}else resetAsk=true}
+ render()});
+render();syncInit();
+</script>
+</body>
+</html>
